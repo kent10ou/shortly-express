@@ -104,9 +104,10 @@ app.post('/signup', function (req, res) {
   // fetch the username
   console.log('username: ', req.body.username);
   console.log('PW: ', req.body.password);
-  db.knex('Users').insert({username: req.body.username, password: req.body.password});
-  var name = db.knex('Users').where({username: req.body.username}).select('username');
-  console.log('name: ', name);
+  db.knex('users').insert({username: req.body.username, password: req.body.password})
+  .then( function(){
+    db.knex('users').where({username: req.body.username}).select('username')
+  }).then(console.log('name:', name));
     // if username is already taken
       // then don't create user
     // if username isn't taken
