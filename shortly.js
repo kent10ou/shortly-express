@@ -79,6 +79,30 @@ function(req, res) {
 // e.g. login, logout, etc.
 /************************************************************/
 
+// directs to login page
+app.get('/login', function (req, res) {
+  res.render('login');
+})
+
+app.post('/login', function (req, res) {
+  var username = req.body.username;
+  var password = req.body.password;
+
+  // if username is in db and pw === username's pw
+    // then create a session
+  // else redirect to login page
+})
+
+// end session
+app.post('/logout', function (req, res) {
+  // redirect to login page
+})
+
+// register a new user
+app.get('/signup', function (req, res) {
+  res.render('signup');
+})
+
 
 
 /************************************************************/
