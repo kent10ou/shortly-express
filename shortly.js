@@ -79,11 +79,12 @@ function(req, res) {
 // e.g. login, logout, etc.
 /************************************************************/
 
-// directs to login page
+// navigates to login page
 app.get('/login', function (req, res) {
   res.render('login');
 })
 
+// sign in user, directs to home page
 app.post('/login', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
@@ -93,15 +94,30 @@ app.post('/login', function (req, res) {
   // else redirect to login page
 })
 
+// navigates to signup page
+app.get('/signup', function (req, res) {
+  res.render('signup');
+})
+
+// 
+app.post('/signup', function (req, res) {
+  // fetch the username
+  console.log('username: ', req.body.username);
+  console.log('PW: ', req.body.password);
+  db.knex('Users').insert({username: req.body.username, password: req.body.password});
+  var name = db.knex('Users').where({username: req.body.username}).select('username');
+  console.log('name: ', name);
+    // if username is already taken
+      // then don't create user
+    // if username isn't taken
+      // add user to collection
+})
+
 // end session
 app.post('/logout', function (req, res) {
   // redirect to login page
 })
 
-// register a new user
-app.get('/signup', function (req, res) {
-  res.render('signup');
-})
 
 
 
