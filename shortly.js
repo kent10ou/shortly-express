@@ -104,19 +104,31 @@ app.post('/signup', function (req, res) {
   // fetch the username
   console.log('username: ', req.body.username);
   console.log('PW: ', req.body.password);
-  db.knex('users').insert({username: req.body.username, password: req.body.password})
-  .then( function(){
-    db.knex('users').where({username: req.body.username}).select('username')
-  }).then(console.log('name:', name));
+  
+  new User({
+    'username': req.body.username,
+    'password': req.body.password
+  }).save()
     // if username is already taken
       // then don't create user
     // if username isn't taken
       // add user to collection
+
+
+
+  // db.knex('users').insert({username: req.body.username, password: req.body.password})
+  //  .then( function(){
+  //   console.log("yo");
+  //   // db.knex('users').where({username: req.body.username}).select('username')
+  //  })
 })
 
 // end session
 app.post('/logout', function (req, res) {
   // redirect to login page
+  // request.session.destroy(function(){
+  //   response.redirect('/');
+  // });
 })
 
 

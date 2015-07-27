@@ -145,12 +145,12 @@ describe('', function() {
       it('Fetches the link url title', function (done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
-+           .where('title', '=', 'Funny pictures of animals, funny dog pictures')
+            .where('title', '=', 'Funny pictures of animals, funny dog pictures')
             .then(function(urls) {
               if (urls['0'] && urls['0']['title']) {
                 var foundTitle = urls['0']['title'];
               }
-+             expect(foundTitle).to.equal('Funny pictures of animals, funny dog pictures');
+              expect(foundTitle).to.equal('Funny pictures of animals, funny dog pictures');
               done();
             });
         });
