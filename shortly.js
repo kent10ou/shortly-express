@@ -28,7 +28,6 @@ app.use(cookieParser('kent and ryan are awesome'));
 app.use(session());
 
 function restrict(req, res, next) {
-  console.log('REQ: ', req.secret);
   if (!req.session.user_id) {
     res.redirect('/login');
   } else {
@@ -126,7 +125,7 @@ app.get('/signup', function (req, res) {
   res.render('signup');
 })
 
-// 
+// adds new users to DB
 app.post('/signup', function (req, res) {
   // fetch the username
   db.knex('users').where({username: req.body.username}).select('username')
@@ -151,23 +150,23 @@ app.post('/signup', function (req, res) {
 
 
 // end session
-app.post('/logout', function (req, res) {
+app.get('/logout',restrict ,function (req, res) {
   // redirect to login page
-  // request.session.destroy(function(){
-  //   response.redirect('/');
-  // });
+  req.session.destroy(function(){
+    res.redirect('/');
+  });
 })
 
 
 
 
 /************************************************************/
-// Handle the wildcard route last - if all other routes fail
+// Handle the wildcard route last - if all other routes fail 
 // assume the route is a short code and try and handle it here.
 // If the short-code doesn't exist, send the user to '/'
 /************************************************************/
 
-app.get('/*', restrict, function(req, res) {
+app.get('/*', function(req, res) {
   new Link({ code: req.params[0] }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');
@@ -182,6 +181,7 @@ app.get('/*', restrict, function(req, res) {
           .update({
             visits: link.get('visits') + 1,
           }).then(function() {
+            console.log("LINK URL: ", link.get('url'));
             return res.redirect(link.get('url'));
           });
       });
