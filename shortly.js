@@ -2,6 +2,8 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+var session = require('express-session');
+var cookieParser = require('cookie-parser');
 
 
 var db = require('./app/config');
@@ -22,23 +24,45 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + '/public'));
 
+app.use(cookieParser('kent and ryan are awesome'));
+app.use(session());
 
-app.get('/', 
+// define restrict function
+// function restrict(req, res, next) {
+//   if (req.session.user) {
+//     next();
+//   } else {
+//     req.session.error = 'Access denied!';
+//     res.redirect('/login');
+//   }
+// }
+
+function restrict(req, res, next) {
+  console.log('REQ: ', req.secret);
+  if (!req.session.user_id) {
+    res.send('You are not authorized to view this page');
+  } else {
+    next();
+  }
+}
+
+app.get('/',restrict, 
 function(req, res) {
   res.render('index');
 });
 
-app.get('/create', 
+app.get('/create',restrict, 
 function(req, res) {
   res.render('index');
 });
 
-app.get('/links', 
+app.get('/links',restrict, 
 function(req, res) {
-  Links.reset().fetch().then(function(links) {
-    res.send(200, links.models);
-  });
+    Links.reset().fetch().then(function(links) {
+      res.send(200, links.models);
+    });
 });
+
 
 app.post('/links', 
 function(req, res) {
@@ -90,8 +114,21 @@ app.post('/login', function (req, res) {
   var password = req.body.password;
 
   // if username is in db and pw === username's pw
+
+
+  if(username == 'demo' && password == 'demo'){
     // then create a session
+    request.session.regenerate(function(){
+      request.session.user = username;
+      response.redirect('/');
+    });
+  } else {
   // else redirect to login page
+    res.redirect('/login');
+  }    
+
+
+
 })
 
 // navigates to signup page
@@ -102,34 +139,25 @@ app.get('/signup', function (req, res) {
 // 
 app.post('/signup', function (req, res) {
   // fetch the username
-  console.log('username: ', req.body.username);
-  console.log('PW: ', req.body.password);
-  
-
-
   db.knex('users').where({username: req.body.username}).select('username')
     .then(function (results){
+    // if username isn't taken
+      // add user to collection
       if (results.length === 0) {
         new User({
           'username': req.body.username,
           'password': req.body.password
-        }).save()    
+        }).save()
+        .then(function(r){
+          res.redirect('/login');
+        })    
+    // if username is already taken
+      // then don't create user
       } else {
         console.log('KNEX');
       }
     })
-
-    // if username is already taken
-      // then don't create user
-    // if username isn't taken
-      // add user to collection
 })
-
-
-
-
-
-
 
 
 // end session
@@ -149,7 +177,7 @@ app.post('/logout', function (req, res) {
 // If the short-code doesn't exist, send the user to '/'
 /************************************************************/
 
-app.get('/*', function(req, res) {
+app.get('/*', restrict, function(req, res) {
   new Link({ code: req.params[0] }).fetch().then(function(link) {
     if (!link) {
       res.redirect('/');
