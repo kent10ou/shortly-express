@@ -14,11 +14,9 @@ a {
 }
 
 h1 {
-  font-style: bold;
   font-size:50px;
   margin-bottom: 10px;
   text-align:center;
-  font-color:pink;
 }
 
 .navigation {
@@ -70,7 +68,7 @@ h1 {
   min-height: 50px;
   background-color:white;
   border-radius:10px;
-  opacity:0.5;
+  opacity:0.7;
 }
 
 .link:hover {

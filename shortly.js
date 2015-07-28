@@ -103,12 +103,11 @@ app.get('/login', function (req, res) {
   res.render('login');
 })
 
-// sign in user, directs to home page
+// sign in user, directs to home page //
 app.post('/login', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
-
-// check if username is in database
+  // check if username is in database
   db.knex('users').where({username: username})
     .then(function (results) {
       // get salt from results
