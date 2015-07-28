@@ -27,20 +27,10 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser('kent and ryan are awesome'));
 app.use(session());
 
-// define restrict function
-// function restrict(req, res, next) {
-//   if (req.session.user) {
-//     next();
-//   } else {
-//     req.session.error = 'Access denied!';
-//     res.redirect('/login');
-//   }
-// }
-
 function restrict(req, res, next) {
   console.log('REQ: ', req.secret);
   if (!req.session.user_id) {
-    res.send('You are not authorized to view this page');
+    res.redirect('/login');
   } else {
     next();
   }
@@ -113,22 +103,22 @@ app.post('/login', function (req, res) {
   var username = req.body.username;
   var password = req.body.password;
 
-  // if username is in db and pw === username's pw
-
-
-  if(username == 'demo' && password == 'demo'){
-    // then create a session
-    request.session.regenerate(function(){
-      request.session.user = username;
-      response.redirect('/');
-    });
-  } else {
-  // else redirect to login page
-    res.redirect('/login');
-  }    
-
-
-
+// check if username is in database
+  db.knex('users').where({username: username})
+    .then(function (results) {
+      console.log('RESULTS: ', results)
+      if(results.length > 0 && results[0].password === password){
+      // then create a session
+        req.session.regenerate(function(){
+          console.log('inside regenerate function');
+          req.session.user_id = username;
+          res.redirect('/');
+        });
+      } else {
+    // else redirect to login page
+      res.redirect('/login');
+      }    
+  })
 })
 
 // navigates to signup page
