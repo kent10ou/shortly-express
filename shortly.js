@@ -27,6 +27,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(cookieParser('kent and ryan are awesome'));
 app.use(session());
 
+// restrict function prevents logged out clients to use the website
 function restrict(req, res, next) {
   if (!req.session.user_id) {
     res.redirect('/login');
@@ -35,16 +36,19 @@ function restrict(req, res, next) {
   }
 }
 
+//creates main page
 app.get('/',restrict, 
 function(req, res) {
   res.render('index');
 });
 
+// recreates main page on creation
 app.get('/create',restrict, 
 function(req, res) {
   res.render('index');
 });
 
+// creates link list
 app.get('/links',restrict, 
 function(req, res) {
     Links.reset().fetch().then(function(links) {
@@ -52,7 +56,8 @@ function(req, res) {
     });
 });
 
-
+// handles submitting links to be shortened
+// adds links to DB
 app.post('/links', 
 function(req, res) {
   var uri = req.body.url;
@@ -105,11 +110,9 @@ app.post('/login', function (req, res) {
 // check if username is in database
   db.knex('users').where({username: username})
     .then(function (results) {
-      console.log('RESULTS: ', results)
       if(results.length > 0 && results[0].password === password){
       // then create a session
         req.session.regenerate(function(){
-          console.log('inside regenerate function');
           req.session.user_id = username;
           res.redirect('/');
         });
@@ -143,7 +146,8 @@ app.post('/signup', function (req, res) {
     // if username is already taken
       // then don't create user
       } else {
-        console.log('KNEX');
+        //redirect to signup page again
+        res.redirect('/signup');
       }
     })
 })
@@ -181,7 +185,6 @@ app.get('/*', function(req, res) {
           .update({
             visits: link.get('visits') + 1,
           }).then(function() {
-            console.log("LINK URL: ", link.get('url'));
             return res.redirect(link.get('url'));
           });
       });

@@ -2,6 +2,9 @@ body {
   margin: 0;
   margin-top: 10px;
   font-family: arial, sans-serif;
+  background-image:url('http://media.giphy.com/media/NuBHQY1PfaXU4/giphy.gif');
+  background-size: 100%;
+  background-repeat: no-repeat;
 }
 
 a {
@@ -11,8 +14,11 @@ a {
 }
 
 h1 {
-  font-style: italic;
+  font-style: bold;
+  font-size:50px;
   margin-bottom: 10px;
+  text-align:center;
+  font-color:pink;
 }
 
 .navigation {
