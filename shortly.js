@@ -2,6 +2,7 @@ var express = require('express');
 var util = require('./lib/utility');
 var partials = require('express-partials');
 var bodyParser = require('body-parser');
+//required session and cookieParser
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 
@@ -141,11 +142,14 @@ app.post('/signup', function (req, res) {
           'password': req.body.password
         }).save()
         .then(function(r){
-          res.redirect('/login');
+          req.session.regenerate(function(){
+            req.session.user_id = req.body.username;
+            res.redirect('/');
+          })
         })    
+      } else {
     // if username is already taken
       // then don't create user
-      } else {
         //redirect to signup page again
         res.redirect('/signup');
       }

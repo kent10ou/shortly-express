@@ -31,9 +31,10 @@ describe('', function() {
   beforeEach(function() {
     // log out currently signed in user
     request('http://127.0.0.1:4568/logout', function(error, res, body) {});
+
     // delete link for roflzoo from db so it can be created later for the test
     db.knex('urls')
-      .where('url', '=', 'http://roflzoo.com/')
+      .where('url', '=', 'http://ryanmcbri.de/')
       .del()
       .catch(function(error) {
         throw {
@@ -115,13 +116,13 @@ describe('', function() {
         'followAllRedirects': true,
         'uri': 'http://127.0.0.1:4568/links',
         'json': {
-          'url': 'http://roflzoo.com/'
+          'url': 'http://ryanmcbri.de/'
         }
       };
 
       it('Responds with the short code', function(done) {
         requestWithSession(options, function(error, res, body) {
-          expect(res.body.url).to.equal('http://roflzoo.com/');
+          expect(res.body.url).to.equal('http://ryanmcbri.de/');
           expect(res.body.code).to.not.be.null;
           done();
         });
@@ -130,12 +131,12 @@ describe('', function() {
       it('New links create a database entry', function(done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
-            .where('url', '=', 'http://roflzoo.com/')
+            .where('url', '=', 'http://ryanmcbri.de/')
             .then(function(urls) {
               if (urls['0'] && urls['0']['url']) {
                 var foundUrl = urls['0']['url'];
               }
-              expect(foundUrl).to.equal('http://roflzoo.com/');
+              expect(foundUrl).to.equal('http://ryanmcbri.de/');
               done();
             });
         });
@@ -144,12 +145,12 @@ describe('', function() {
       it('Fetches the link url title', function (done) {
         requestWithSession(options, function(error, res, body) {
           db.knex('urls')
-            .where('title', '=', 'Funny pictures of animals, funny dog pictures')
+            .where('title', '=', 'ryan_code')
             .then(function(urls) {
               if (urls['0'] && urls['0']['title']) {
                 var foundTitle = urls['0']['title'];
               }
-              expect(foundTitle).to.equal('Funny pictures of animals, funny dog pictures');
+              expect(foundTitle).to.equal('ryan_code');
               done();
             });
         });
@@ -164,8 +165,8 @@ describe('', function() {
       beforeEach(function(done){
         // save a link to the database
         link = new Link({
-          url: 'http://roflzoo.com/',
-          title: 'Funny animal pictures, funny animals, funniest dogs',
+          url: 'http://ryanmcbri.de/',
+          title: 'ryan_code',
           base_url: 'http://127.0.0.1:4568'
         });
         link.save().then(function(){
@@ -179,7 +180,7 @@ describe('', function() {
           'followAllRedirects': true,
           'uri': 'http://127.0.0.1:4568/links',
           'json': {
-            'url': 'http://roflzoo.com/'
+            'url': 'http://ryanmcbri.de/'
           }
         };
 
@@ -198,7 +199,7 @@ describe('', function() {
 
         requestWithSession(options, function(error, res, body) {
           var currentLocation = res.request.href;
-          expect(currentLocation).to.equal('http://roflzoo.com/');
+          expect(currentLocation).to.equal('http://ryanmcbri.de/');
           done();
         });
       });
@@ -210,7 +211,7 @@ describe('', function() {
         };
 
         requestWithSession(options, function(error, res, body) {
-          expect(body).to.include('"title":"Funny animal pictures, funny animals, funniest dogs"');
+          expect(body).to.include('"title":"ryan_code"');
           expect(body).to.include('"code":"' + link.get('code') + '"');
           done();
         });
@@ -338,6 +339,6 @@ describe('', function() {
       });
     });
 
-  }); // 'Account Login' 
+  }); // 'Account Login'
 
 });
