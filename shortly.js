@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 //required session and cookieParser
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-
+var crypto = require('crypto');
 
 var db = require('./app/config');
 var Users = require('./app/collections/users');
@@ -111,6 +111,12 @@ app.post('/login', function (req, res) {
 // check if username is in database
   db.knex('users').where({username: username})
     .then(function (results) {
+      // get salt from results
+      var hexValue = crypto.createHash('sha1').update(password + results[0].salt)
+      password = hexValue.digest('hex');
+        // add that to password
+          // run pw through hash
+            //compare with stored pw
       if(results.length > 0 && results[0].password === password){
       // then create a session
         req.session.regenerate(function(){
@@ -136,10 +142,13 @@ app.post('/signup', function (req, res) {
     .then(function (results){
     // if username isn't taken
       // add user to collection
+      var salt = crypto.randomBytes(16);
+      var hexValue = crypto.createHash('sha1').update(req.body.password + salt)
       if (results.length === 0) {
         new User({
           'username': req.body.username,
-          'password': req.body.password
+          'salt': salt,
+          'password': hexValue.digest('hex')
         }).save()
         .then(function(r){
           req.session.regenerate(function(){
