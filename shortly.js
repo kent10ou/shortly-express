@@ -111,19 +111,24 @@ app.post('/login', function (req, res) {
   db.knex('users').where({username: username})
     .then(function (results) {
       // get salt from results
-      var hexValue = crypto.createHash('sha1').update(password + results[0].salt)
-      password = hexValue.digest('hex');
         // add that to password
           // run pw through hash
             //compare with stored pw
-      if(results.length > 0 && results[0].password === password){
-      // then create a session
-        req.session.regenerate(function(){
-          req.session.user_id = username;
-          res.redirect('/');
-        });
+      if(results.length > 0) { 
+        var hexValue = crypto.createHash('sha1').update(password + results[0].salt)
+        password = hexValue.digest('hex');
+        if (results[0].password === password) {
+          // then create a session
+          req.session.regenerate(function(){
+            req.session.user_id = username;
+            res.redirect('/');
+          });
+        }
       } else {
     // else redirect to login page
+      //find form field
+      //add error message to it
+      //addclass error
       res.redirect('/login');
       }    
   })
